@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# HPC Lmod/module init (SuperCloud/Engaging); harmless on hosts without it. Must precede set -u.
+[ -f /etc/profile ] && source /etc/profile >/dev/null 2>&1 || true
 set -euo pipefail
 cd "$(dirname "$0")"
 # One-shot env build. Run on a node that can SEE the target GPU (openfold compiles per GPU arch).

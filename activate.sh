@@ -16,14 +16,14 @@ case "$CUE_HOST" in
     export TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST:-8.0}"
     ;;
   supercloud)
-    command -v module >/dev/null 2>&1 && module load cuda/12.6
-    : "${CUDA_HOME:=$(command -v nvcc >/dev/null 2>&1 && dirname "$(dirname "$(command -v nvcc)")")}"
+    module load cuda/12.6 2>/dev/null || true
+    : "${CUDA_HOME:=$(command -v nvcc >/dev/null 2>&1 && dirname "$(dirname "$(command -v nvcc)")" || true)}"
     export CUDA_HOME
     export TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST:-7.0}"   # V100 sm_70
     ;;
   engaging)
-    command -v module >/dev/null 2>&1 && { module load cuda/12.6 2>/dev/null || module load cuda; }
-    : "${CUDA_HOME:=$(command -v nvcc >/dev/null 2>&1 && dirname "$(dirname "$(command -v nvcc)")")}"
+    { module load cuda/12.6 2>/dev/null || module load cuda 2>/dev/null; } || true
+    : "${CUDA_HOME:=$(command -v nvcc >/dev/null 2>&1 && dirname "$(dirname "$(command -v nvcc)")" || true)}"
     export CUDA_HOME
     export TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST:?set per allocated Engaging GPU, e.g. 7.0/8.0/9.0}"
     ;;
