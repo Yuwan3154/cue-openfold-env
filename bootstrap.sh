@@ -6,11 +6,12 @@ cd "$(dirname "$0")"
 # One-shot env build. Run on a node that can SEE the target GPU (openfold compiles per GPU arch).
 #   CUE_HOST=a100|supercloud|engaging ./bootstrap.sh   (engaging also needs TORCH_CUDA_ARCH_LIST)
 
-# 1. uv
-if ! command -v uv >/dev/null 2>&1; then
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-  export PATH="$HOME/.local/bin:$PATH"
-fi
+# Build temp on the home FS: some HPC /tmp has a tiny per-user quota (SuperCloud = 512M).
+export TMPDIR="$PWD/.uvtmp"; mkdir -p "$TMPDIR"
+
+# 1. uv (its binary lives in ~/.local/bin; put that on PATH BEFORE checking, so we don't reinstall)
+export PATH="$HOME/.local/bin:$PATH"
+command -v uv >/dev/null 2>&1 || curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # 2. venv + env vars
 uv venv --clear --python 3.11.12 .venv

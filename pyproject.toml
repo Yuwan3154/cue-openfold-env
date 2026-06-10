@@ -19,8 +19,9 @@ dependencies = [
   "wget==3.2", "tqdm==4.66.4", "ml-collections==0.1.1", "jaxtyping",
   "cpdb-protein", "loralib", "biopython", "matplotlib", "Pillow",
   "transformers==4.48.3", "modelcif", "opt-einsum-fx", "e3nn>=0.5,<0.6",
-  # structure tooling (pip; pdbfixer via git source below)
-  "openmm", "pdbfixer",
+  # structure tooling (pip; pdbfixer via git source below). openmm pinned to 8.3.1: newest stable
+  # with a manylinux_2_28 wheel (Engaging is Rocky 8 / glibc 2.28; 8.4+ wheels need glibc 2.34).
+  "openmm==8.3.1", "pdbfixer",
   # build tools needed in-venv for the no-build-isolation builds (also present in the real env)
   "ninja", "cython", "setuptools", "wheel",
   # local editable repos (no conflicting runtime deps); ProteinEBM is --no-deps in postsync.sh
