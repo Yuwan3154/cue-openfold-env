@@ -23,7 +23,8 @@ case "$CUE_HOST" in
     export TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST:-7.0}"   # V100 sm_70
     ;;
   engaging)
-    { module load cuda/12.6 2>/dev/null || module load cuda 2>/dev/null; } || true
+    # Engaging has no cuda/12.6; use a CUDA 12.x (ABI-compatible with torch cu126). Never bare `cuda` (=13.x).
+    { module load cuda/12.9.1 2>/dev/null || module load cuda/12.6 2>/dev/null; } || true
     : "${CUDA_HOME:=$(command -v nvcc >/dev/null 2>&1 && dirname "$(dirname "$(command -v nvcc)")" || true)}"
     export CUDA_HOME
     export TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST:?set per allocated Engaging GPU, e.g. 7.0/8.0/9.0}"
