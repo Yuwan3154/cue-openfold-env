@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.egg-info/
+*.so
+# self-contained MSA binaries are downloaded/built per host -- keep only the installer
+tools/*
+!tools/install_msa_binaries.sh

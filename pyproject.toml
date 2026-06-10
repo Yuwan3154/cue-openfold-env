@@ -1,0 +1,51 @@
+[project]
+name = "cue-openfold-env"
+version = "0.1.0"
+requires-python = ">=3.11,<3.12"
+# Tier A only. Tier B (dgl, PyG companions, cuequivariance, huhlim forks, ProteinEBM) lives in
+# postsync.sh and is NOT locked here -- a `uv sync` PRUNES Tier B, so re-run postsync.sh afterward.
+dependencies = [
+  # torch stack (cu126 index, pinned via [tool.uv.sources])
+  "torch==2.7.1", "torchvision==0.22.1", "torchaudio==2.7.1",
+  # prebuilt wheel (URL source) + torch-coupled builds
+  "flash-attn", "deepspeed==0.14.5", "dllogger",
+  # lightning: both the umbrella (proteina) and standalone pytorch_lightning (openfold)
+  "lightning==2.5.0", "pytorch-lightning==2.5.1", "tensorboard==2.19.0",
+  # numerical (FINAL pins from the working env; numpy also constrained below)
+  "numpy==1.26.4", "pandas==2.3.3", "scipy==1.16.3",
+  # the proteina/openfold explicit pip set
+  "biotite==0.41.0", "python-dotenv==1.0.1", "einops==0.6", "dm-tree==0.1.8",
+  "loguru==0.7.2", "hydra-core==1.3.1", "biopandas==0.5.1", "wandb==0.17.0",
+  "wget==3.2", "tqdm==4.66.4", "ml-collections==0.1.1", "jaxtyping",
+  "cpdb-protein", "loralib", "biopython", "matplotlib", "Pillow",
+  "transformers==4.48.3", "modelcif", "opt-einsum-fx", "e3nn>=0.5,<0.6",
+  # structure tooling (pip; pdbfixer via git source below)
+  "openmm", "pdbfixer",
+  # build tools needed in-venv for the no-build-isolation builds (also present in the real env)
+  "ninja", "cython", "setuptools", "wheel",
+  # local editable repos (no conflicting runtime deps); ProteinEBM is --no-deps in postsync.sh
+  "openfold", "proteinfoundation", "frame2confind",
+]
+
+[tool.uv.sources]
+torch       = { index = "pytorch-cu126" }
+torchvision = { index = "pytorch-cu126" }
+torchaudio  = { index = "pytorch-cu126" }
+flash-attn  = { url = "https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.7cxx11abiTRUE-cp311-cp311-linux_x86_64.whl" }
+dllogger    = { git = "https://github.com/NVIDIA/dllogger.git" }
+pdbfixer    = { git = "https://github.com/openmm/pdbfixer.git", tag = "v1.12" }
+openfold          = { path = "../openfold",      editable = true }
+proteinfoundation = { path = "../proteina",      editable = true }
+frame2confind     = { path = "../Frame2ConFind", editable = true }
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url  = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.uv]
+# openfold (CUDA ext) + deepspeed import torch at build; flash-attn listed as insurance.
+no-build-isolation-package = ["openfold", "deepspeed", "flash-attn"]
+constraint-dependencies = ["numpy==1.26.4"]
+# All three target hosts are linux-x64; lock only that platform (and lets locking ignore macOS wheels).
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
