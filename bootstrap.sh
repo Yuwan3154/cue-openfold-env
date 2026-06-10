@@ -26,8 +26,8 @@ uv pip install ninja cython setuptools wheel numpy==1.26.4
 # 4. CUTLASS (runtime: DeepSpeed Evoformer kernel; not needed at openfold build time)
 [ -d ../openfold/cutlass ] || git clone --depth 1 -b v3.6.0 https://github.com/NVIDIA/cutlass.git ../openfold/cutlass
 
-# 5. Tier A: full sync (builds openfold CUDA ext + deepspeed against the seeded torch).
-uv sync
+# 5. Tier A: sync (builds openfold CUDA ext). deepspeed is built in postsync (needs triton absent).
+uv sync --no-install-package deepspeed
 
 # 6. Tier B: --no-deps / build-tagged wheels / conflicting-pin editable (NOT in the lockfile).
 bash ./postsync.sh

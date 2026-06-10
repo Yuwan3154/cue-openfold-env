@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # Source AFTER `source .venv/bin/activate`. Replaces conda's `env config vars`.
 # Host autodetect; override with CUE_HOST=a100|supercloud|engaging.
-: "${CUE_HOST:=$( if [[ -d /usr/local/cuda-12.6 && -z "${LMOD_CMD:-}" ]]; then echo a100;
-  elif [[ -n "${SLURM_CLUSTER_NAME:-}" || "$(hostname -f 2>/dev/null)" == *mit.edu* ]]; then echo supercloud;
-  else echo engaging; fi )}"
+# Both SuperCloud and Engaging are *.mit.edu, so discriminate by filesystem: gridsan vs orcd.
+: "${CUE_HOST:=$(
+  if   [[ -d /home/gridsan || "$(hostname 2>/dev/null)" == *txe1* ]]; then echo supercloud
+  elif [[ -d /orcd         || "$(hostname 2>/dev/null)" == *orcd* ]]; then echo engaging
+  else echo a100; fi )}"
 
 VENV="${VIRTUAL_ENV:?source .venv/bin/activate first}"
 ENV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

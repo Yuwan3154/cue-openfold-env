@@ -5,6 +5,13 @@ cd "$(dirname "$0")"
 # the conflicting-pin editable (ProteinEBM). Run AFTER `uv sync`. A re-run of `uv sync` (or any
 # `uv run`) PRUNES everything below -- re-run this script after any sync.
 
+# deepspeed: build with triton temporarily removed. Its op enumeration imports triton, whose driver
+# init fails on GPU-less build hosts ("0 active drivers"); with triton absent the ops just defer to
+# runtime JIT and the sdist builds anywhere. torch/ninja for the build come from the synced venv.
+uv pip uninstall triton 2>/dev/null || true
+DS_BUILD_OPS=0 uv pip install --no-build-isolation --no-deps deepspeed==0.14.5
+uv pip install triton==3.3.1
+
 # PyG companions (build-tagged +pt27cu126) via flat index
 uv pip install torch-scatter torch-sparse torch-cluster torch-spline-conv pyg_lib torch_geometric \
   -f https://data.pyg.org/whl/torch-2.7.1+cu126.html
