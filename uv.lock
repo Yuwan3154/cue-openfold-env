@@ -266,7 +266,7 @@ requires-dist = [
     { name = "ninja" },
     { name = "numpy", specifier = "==1.26.4" },
     { name = "openfold", editable = "../openfold" },
-    { name = "openmm" },
+    { name = "openmm", specifier = "==8.3.1" },
     { name = "opt-einsum-fx" },
     { name = "pandas", specifier = "==2.3.3" },
     { name = "pdbfixer", git = "https://github.com/openmm/pdbfixer.git?tag=v1.12" },
@@ -950,13 +950,13 @@ provides-extras = ["cuequivariance"]
 
 [[package]]
 name = "openmm"
-version = "8.5.2"
+version = "8.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/77/68/f1475d44b1292ff8e75ef084ddc14a4bc197feefaba1c69c4e09bf8b9bc0/openmm-8.5.2-cp311-cp311-manylinux_2_34_x86_64.whl", hash = "sha256:507083d4792ba9c811b451c63b79477ed9bed603ee88d748b99f74fc0c7a5a91", size = 14383501, upload-time = "2026-06-08T18:19:18.219Z" },
+    { url = "https://files.pythonhosted.org/packages/0d/9d/5b7199d01ac92acfb2f5038ec433c10fc8df30839675f029395168d46a05/openmm-8.3.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:5a80872967adfadb4619df8b72b0d50b5a79c2261134713ee243b0e394645ccd", size = 14021672, upload-time = "2025-07-19T00:28:14.299Z" },
 ]
 
 [[package]]
