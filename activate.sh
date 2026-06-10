@@ -17,7 +17,8 @@ case "$CUE_HOST" in
     ;;
   supercloud)
     module load cuda/12.6 2>/dev/null || true
-    : "${CUDA_HOME:=$(command -v nvcc >/dev/null 2>&1 && dirname "$(dirname "$(command -v nvcc)")" || true)}"
+    # derive from nvcc if the module put it on PATH; else fall back to the known module install prefix
+    : "${CUDA_HOME:=$(command -v nvcc >/dev/null 2>&1 && dirname "$(dirname "$(command -v nvcc)")" || echo /usr/local/pkg/cuda/cuda-12.6)}"
     export CUDA_HOME
     export TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST:-7.0}"   # V100 sm_70
     ;;
