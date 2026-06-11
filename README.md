@@ -47,8 +47,8 @@ is done with triton temporarily uninstalled, so its ops just defer to runtime JI
   `CUE_HOST=supercloud ./bootstrap.sh`.
 - **Engaging**: Rocky 8 / glibc 2.28 + libstdc++ GLIBCXX_3.4.25 — older than several prebuilt wheels, so:
   `openmm==8.3.1` (manylinux_2_28); `cuda/12.9.1` (no 12.6, never bare `cuda` = 13.x); gcc 12.2 libstdc++
-  on `LD_LIBRARY_PATH` for **dgl** (needs 3.4.26); **flash-attn** rebuilt from source (its wheel needs
-  glibc 2.32 — postsync auto-detects and rebuilds, ~30-60 min). The PyG companions
-  (torch_scatter/sparse/pyg_lib) stay broken but `torch_geometric` auto-disables them and falls back to
-  torch-native. All Engaging nodes have internet; build on login or a compute node.
+  on `LD_LIBRARY_PATH` for **dgl** (needs 3.4.26); **flash-attn AND the PyG companions**
+  (torch_scatter/sparse/cluster/spline_conv/pyg_lib) rebuilt from source (their wheels need glibc 2.32 —
+  postsync auto-detects via import-failure and rebuilds, ~1 h total; all are required). All Engaging
+  nodes have internet; build on login or a compute node.
   `CUE_HOST=engaging TORCH_CUDA_ARCH_LIST=8.9;9.0 ./bootstrap.sh`.

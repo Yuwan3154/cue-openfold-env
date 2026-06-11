@@ -15,6 +15,14 @@ uv pip install triton==3.3.1
 # PyG companions (build-tagged +pt27cu126) via flat index
 uv pip install torch-scatter torch-sparse torch-cluster torch-spline-conv pyg_lib torch_geometric \
   -f https://data.pyg.org/whl/torch-2.7.1+cu126.html
+# On old glibc (Engaging Rocky 8 / 2.28) those +pt27cu126 wheels need GLIBC_2.32 and won't load -> rebuild
+# from source against the local glibc + TORCH_CUDA_ARCH_LIST. All are required (torch_geometric uses them).
+if ! python -c 'import torch_scatter, torch_sparse, torch_cluster, torch_spline_conv, pyg_lib' >/dev/null 2>&1; then
+  echo "PyG companion wheels not importable (old glibc); rebuilding from source ..."
+  uv pip uninstall torch-scatter torch-sparse torch-cluster torch-spline-conv pyg-lib >/dev/null 2>&1 || true
+  MAX_JOBS="${MAX_JOBS:-8}" uv pip install --no-build-isolation --no-deps torch-scatter torch-sparse torch-cluster torch-spline-conv
+  MAX_JOBS="${MAX_JOBS:-8}" uv pip install --no-build-isolation --no-deps "git+https://github.com/pyg-team/pyg-lib.git"
+fi
 
 # dgl: wheel built for torch2.4/cu124, ABI-compatible with torch2.7; --no-deps keeps torch 2.7
 uv pip install --no-deps dgl==2.4.0+cu124 -f https://data.dgl.ai/wheels/torch-2.4/cu124/repo.html
