@@ -40,9 +40,15 @@ is done with triton temporarily uninstalled, so its ops just defer to runtime JI
 
 ## Per-host notes
 - **A100**: dedicated GPU box, system CUDA 12.6, no modules, sm_80. `CUE_HOST=a100 ./bootstrap.sh`.
+- **A6000**: dedicated GPU box (RTX A6000, sm_86), Ubuntu 24.04, system CUDA 12.6, no modules.
+  `CUE_HOST=a6000 ./bootstrap.sh`.
 - **SuperCloud**: `module load cuda/12.6` only (never the conda pytorch module — shadows the venv torch).
   `/tmp` has a 512M per-user quota, so bootstrap puts `TMPDIR` on the home FS. GPU smoke on xeon-g6-volta.
   `CUE_HOST=supercloud ./bootstrap.sh`.
-- **Engaging**: Rocky 8 / glibc 2.28 (hence `openmm==8.3.1`, the newest with a manylinux_2_28 wheel); no
-  `cuda/12.6`, so it loads `cuda/12.9.1` (still CUDA 12.x). Set `TORCH_CUDA_ARCH_LIST` (e.g. `8.9;9.0`
-  for L40S/H100/H200). `CUE_HOST=engaging TORCH_CUDA_ARCH_LIST=9.0 ./bootstrap.sh`.
+- **Engaging**: Rocky 8 / glibc 2.28 + libstdc++ GLIBCXX_3.4.25 — older than several prebuilt wheels, so:
+  `openmm==8.3.1` (manylinux_2_28); `cuda/12.9.1` (no 12.6, never bare `cuda` = 13.x); gcc 12.2 libstdc++
+  on `LD_LIBRARY_PATH` for **dgl** (needs 3.4.26); **flash-attn** rebuilt from source (its wheel needs
+  glibc 2.32 — postsync auto-detects and rebuilds, ~30-60 min). The PyG companions
+  (torch_scatter/sparse/pyg_lib) stay broken but `torch_geometric` auto-disables them and falls back to
+  torch-native. All Engaging nodes have internet; build on login or a compute node.
+  `CUE_HOST=engaging TORCH_CUDA_ARCH_LIST=8.9;9.0 ./bootstrap.sh`.
