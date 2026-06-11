@@ -5,6 +5,7 @@
 : "${CUE_HOST:=$(
   if   [[ -d /home/gridsan || "$(hostname 2>/dev/null)" == *txe1* ]]; then echo supercloud
   elif [[ -d /orcd         || "$(hostname 2>/dev/null)" == *orcd* ]]; then echo engaging
+  elif [[ "$(hostname 2>/dev/null)" == *a6000* ]]; then echo a6000
   else echo a100; fi )}"
 
 VENV="${VIRTUAL_ENV:?source .venv/bin/activate first}"
@@ -16,6 +17,10 @@ case "$CUE_HOST" in
   a100)
     export CUDA_HOME="${CUDA_HOME:-/usr/local/cuda-12.6}"
     export TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST:-8.0}"
+    ;;
+  a6000)
+    export CUDA_HOME="${CUDA_HOME:-/usr/local/cuda-12.6}"
+    export TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST:-8.6}"   # RTX A6000 sm_86
     ;;
   supercloud)
     module load cuda/12.6 2>/dev/null || true
