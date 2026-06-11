@@ -32,6 +32,9 @@ case "$CUE_HOST" in
   engaging)
     # Engaging has no cuda/12.6; use a CUDA 12.x (ABI-compatible with torch cu126). Never bare `cuda` (=13.x).
     { module load cuda/12.9.1 2>/dev/null || module load cuda/12.6 2>/dev/null; } || true
+    # Rocky 8 system libstdc++ is GLIBCXX_3.4.25; dgl needs 3.4.26 -> put gcc 12's newer libstdc++ on the path.
+    module load gcc/12.2.0 2>/dev/null || true
+    _gl="$(gcc -print-file-name=libstdc++.so.6 2>/dev/null)"; [ -f "$_gl" ] && export LD_LIBRARY_PATH="$(dirname "$_gl"):${LD_LIBRARY_PATH:-}"
     : "${CUDA_HOME:=$(command -v nvcc >/dev/null 2>&1 && dirname "$(dirname "$(command -v nvcc)")" || true)}"
     export CUDA_HOME
     export TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST:?set per allocated Engaging GPU, e.g. 7.0/8.0/9.0}"
