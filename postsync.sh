@@ -31,4 +31,13 @@ uv pip install --no-deps "git+https://github.com/huhlim/mdtraj.git"
 uv pip install --no-deps "git+https://github.com/huhlim/SE3Transformer.git"
 uv pip install --no-deps "git+http://github.com/huhlim/cg2all"   # http:// verbatim; https fallback
 
+# flash-attn: the prebuilt wheel (Tier A) needs glibc 2.32. On older glibc (Engaging Rocky 8 / 2.28) it
+# won't load -> rebuild from source against the local glibc + TORCH_CUDA_ARCH_LIST. Slow (~30-60 min);
+# only triggers where the prebuilt wheel can't import, so newer-glibc hosts keep the fast wheel.
+if ! python -c 'import flash_attn' >/dev/null 2>&1; then
+  echo "flash-attn prebuilt wheel not importable (old glibc); rebuilding from source ..."
+  uv pip uninstall flash-attn >/dev/null 2>&1 || true
+  MAX_JOBS="${MAX_JOBS:-8}" FLASH_ATTENTION_FORCE_BUILD=TRUE uv pip install --no-build-isolation --no-deps flash-attn==2.8.3
+fi
+
 echo "=== postsync (Tier B) complete ==="
